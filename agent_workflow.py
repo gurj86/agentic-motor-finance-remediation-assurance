@@ -22,6 +22,7 @@ class AssuranceResult(BaseModel):
     recommendation: Literal["Pass", "Further Work", "Escalate"]
     rationale: str
     agents_consulted: list[str] = Field(default_factory=list)
+    escalation_drivers: list[str] = Field(default_factory=list)
     findings: list[AssuranceFinding] = Field(default_factory=list)
     evidence_to_obtain: list[str] = Field(default_factory=list)
     human_review_note: str
@@ -174,6 +175,12 @@ or "CONRED 5". Do not provide a URL without its matching reference label.
 Only use URLs supplied by the regulatory specialist from the approved map.
 Never fabricate rules or URLs. If there is no sufficiently supported regulatory
 reference for a finding, leave both fields null.
+
+Populate escalation_drivers with the 2-3 most material reasons supporting the
+overall recommendation. Keep each driver short, evidence-led and audit-friendly.
+If the recommendation is Pass, use an empty list. If the recommendation is Further
+Work, use the most material unresolved evidence or methodology points rather than
+calling them escalation issues.
 
 Keep the output concise and practical for a QA / remediation reviewer. Make clear
 that the human reviewer owns the final decision.
