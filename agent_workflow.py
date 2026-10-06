@@ -21,6 +21,7 @@ class AssuranceResult(BaseModel):
     case_summary: str
     recommendation: Literal["Pass", "Further Work", "Escalate"]
     rationale: str
+    agents_consulted: list[str] = Field(default_factory=list)
     findings: list[AssuranceFinding] = Field(default_factory=list)
     evidence_to_obtain: list[str] = Field(default_factory=list)
     human_review_note: str
@@ -156,9 +157,23 @@ Recommend:
 - Escalate where there is a potentially significant contradiction, missing key
   evidence, material customer-outcome concern or issue needing senior review.
 
-For each finding, populate fca_reference and fca_url when the regulatory specialist
-has identified an applicable reference. Only use URLs supplied by the regulatory
-specialist from the approved map. Never fabricate URLs.
+Record the names of the specialist tools you ACTUALLY called in agents_consulted.
+Do not list a specialist unless you called that tool during this review. Use these
+friendly labels:
+- Commission Evidence
+- Arrangement Classification
+- Disclosure & Customer Evidence
+- Redress & Methodology
+- Evidence Challenge
+- Regulatory Reference
+
+For each finding, populate fca_reference AND fca_url when the regulatory specialist
+has identified an applicable reference. The reference must name the exact rule or
+source returned by the regulatory specialist, for example "CONC 4.5.3 / 4.5.3A"
+or "CONRED 5". Do not provide a URL without its matching reference label.
+Only use URLs supplied by the regulatory specialist from the approved map.
+Never fabricate rules or URLs. If there is no sufficiently supported regulatory
+reference for a finding, leave both fields null.
 
 Keep the output concise and practical for a QA / remediation reviewer. Make clear
 that the human reviewer owns the final decision.
