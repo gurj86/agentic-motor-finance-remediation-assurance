@@ -14,7 +14,7 @@ main{margin-top:-22px;padding-bottom:50px}.card{background:#fff;border:1px solid
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field.full{grid-column:1/-1}label{display:block;font-size:12px;font-weight:800;margin:0 0 5px}textarea{width:100%;min-height:105px;border:1px solid #cad4e2;border-radius:10px;padding:11px;font:inherit;resize:vertical}
 .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}button{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer}.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
 .results{display:none}.results.show{display:block}.finding{border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:10px;padding:13px;margin:9px 0}.finding.high{border-left-color:var(--red)}.finding.low{border-left-color:var(--green)}.finding p{margin:5px 0;color:#475467}.finding a{display:inline-block;margin-top:7px;color:var(--blue);font-weight:800;text-decoration:none}.finding a:hover{text-decoration:underline}
-.badge{display:inline-block;border-radius:999px;padding:6px 9px;font-size:12px;font-weight:800;background:#eef3ff;color:#234baf}.human{background:#f7f9fc;border:1px solid var(--line);border-radius:11px;padding:14px;margin-top:14px}.evidence{background:#fafafa;border:1px dashed #ccd5e2;border-radius:10px;padding:12px;margin-top:12px}
+.badge{display:inline-block;border-radius:999px;padding:6px 9px;font-size:12px;font-weight:800;background:#eef3ff;color:#234baf}.agents{background:#f5f7ff;border:1px solid #d9e2ff;border-radius:11px;padding:12px 14px;margin:12px 0}.agents strong{display:block;margin-bottom:7px}.agent-chip{display:inline-block;margin:3px 5px 3px 0;padding:5px 9px;border-radius:999px;background:#fff;border:1px solid #cad6ff;color:#2949a5;font-size:12px;font-weight:800}.human{background:#f7f9fc;border:1px solid var(--line);border-radius:11px;padding:14px;margin-top:14px}.evidence{background:#fafafa;border:1px dashed #ccd5e2;border-radius:10px;padding:12px;margin-top:12px}
 .decision-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.decision-row button.active{background:var(--navy);color:#fff}.status{font-size:13px;color:var(--muted);margin-top:8px}
 @media(max-width:850px){.flow{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}@media(max-width:560px){.flow{grid-template-columns:1fr}}
 </style>
@@ -72,6 +72,7 @@ main{margin-top:-22px;padding-bottom:50px}.card{background:#fff;border:1px solid
     <h2 id="recommendation">—</h2>
     <span class="badge" id="findingCount">—</span>
     <p id="summary"></p>
+    <div class="agents" id="agentsBox" style="display:none"><strong>Specialist agents consulted</strong><div id="agentsConsulted"></div></div>
     <div id="findings"></div>
     <div class="evidence" id="evidenceBox" style="display:none"><strong>Evidence to obtain / verify</strong><ul id="evidenceList"></ul></div>
     <div class="human">
@@ -111,6 +112,9 @@ document.getElementById("run").onclick=async()=>{
   document.getElementById("recommendation").textContent=data.recommendation;
   document.getElementById("findingCount").textContent=data.findings.length+" findings";
   document.getElementById("summary").textContent=data.case_summary+" "+data.rationale;
+  const agents=data.agents_consulted||[];
+  document.getElementById("agentsBox").style.display=agents.length?"block":"none";
+  document.getElementById("agentsConsulted").innerHTML=agents.map(a=>'<span class="agent-chip">'+esc(a)+'</span>').join("");
   document.getElementById("findings").innerHTML=data.findings.map(f=>'<div class="finding '+esc(f.severity)+'"><strong>'+esc(f.area)+' · '+esc(f.severity).toUpperCase()+'</strong><p><b>Issue:</b> '+esc(f.issue)+'</p><p><b>Why it matters:</b> '+esc(f.why_it_matters)+'</p><p><b>Reviewer action:</b> '+esc(f.reviewer_action)+'</p>'+(f.fca_reference?'<p><b>FCA reference to verify:</b> '+esc(f.fca_reference)+'</p>':'')+(f.fca_url?'<a href="'+esc(f.fca_url)+'" target="_blank" rel="noreferrer">Open official FCA source →</a>':'')+'</div>').join("");
   const ev=data.evidence_to_obtain||[];document.getElementById("evidenceBox").style.display=ev.length?"block":"none";document.getElementById("evidenceList").innerHTML=ev.map(x=>"<li>"+esc(x)+"</li>").join("");
   document.getElementById("humanNote").textContent=data.human_review_note;
